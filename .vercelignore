@@ -1,0 +1,25 @@
+# Ignore server files from being served as static
+dist/index.js
+dist/routers.js
+dist/_core/
+
+# Ignore development files
+*.ts
+server/
+client/src/
+drizzle/
+
+# Ignore config files
+tsconfig.json
+vite.config.ts
+drizzle.config.ts
+
+# Ignore database
+*.db
+*.db-journal
+
+# Ignore node_modules
+node_modules/
+
+# Ignore git
+.git/
