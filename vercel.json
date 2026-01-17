@@ -1,29 +1,21 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist/public",
+  "rewrites": [
     {
-      "src": "api/serverless.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/public"
-      }
+      "source": "/api/:path*",
+      "destination": "/api/serverless"
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/serverless.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ]
 }

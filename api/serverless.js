@@ -1,4 +1,6 @@
-// Vercel Serverless Function Handler
+// Vercel Serverless Function
+// This must export a function that handles (req, res)
+
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
@@ -6,6 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../dist/routers.js";
 import { createContext } from "../dist/_core/context.js";
 
+// Create Express app
 const app = express();
 
 // Configure body parser
@@ -35,6 +38,10 @@ app.use((req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
 
-export default app;
+// Export handler for Vercel
+export default (req, res) => {
+  // Vercel needs the handler to return a promise
+  return app(req, res);
+};
 
 
