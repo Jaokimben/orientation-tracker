@@ -1,25 +1,25 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 /**
  * Core user table backing auth flow.
  * Extend this file with additional tables as your product grows.
  * Columns use camelCase to match both database fields and generated types.
  */
-export const users = mysqlTable("users", {
+export const users = sqliteTable("users", {
   /**
    * Surrogate primary key. Auto-incremented numeric value managed by the database.
    * Use this for relations between tables.
    */
-  id: int("id").autoincrement().primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  openId: text("openId").notNull().unique(),
   name: text("name"),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  email: text("email"),
+  loginMethod: text("loginMethod"),
+  role: text("role", { enum: ["user", "admin"] }).default("user").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()).$onUpdateFn(() => new Date()),
+  lastSignedIn: integer("lastSignedIn", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 export type User = typeof users.$inferSelect;
@@ -28,15 +28,15 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Actions table - stores all orientation tasks
  */
-export const actions = mysqlTable("actions", {
-  id: varchar("id", { length: 10 }).primaryKey(), // e.g., "1.1", "2.3"
+export const actions = sqliteTable("actions", {
+  id: text("id").primaryKey(), // e.g., "1.1", "2.3"
   title: text("title").notNull(),
   description: text("description").notNull(),
-  deadline: varchar("deadline", { length: 10 }).notNull(), // YYYY-MM-DD format
-  phase: varchar("phase", { length: 20 }).notNull(), // e.g., "phase1", "phase2"
+  deadline: text("deadline").notNull(), // YYYY-MM-DD format
+  phase: text("phase").notNull(), // e.g., "phase1", "phase2"
   link: text("link"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()).$onUpdateFn(() => new Date()),
 });
 
 export type Action = typeof actions.$inferSelect;
@@ -45,14 +45,14 @@ export type InsertAction = typeof actions.$inferInsert;
 /**
  * User progress table - tracks which actions each user has completed
  */
-export const userProgress = mysqlTable("user_progress", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  actionId: varchar("actionId", { length: 10 }).notNull(),
-  completed: boolean("completed").default(false).notNull(),
-  completedAt: timestamp("completedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+export const userProgress = sqliteTable("user_progress", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("userId").notNull(),
+  actionId: text("actionId").notNull(),
+  completed: integer("completed", { mode: "boolean" }).default(false).notNull(),
+  completedAt: integer("completedAt", { mode: "timestamp" }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()).$onUpdateFn(() => new Date()),
 });
 
 export type UserProgress = typeof userProgress.$inferSelect;

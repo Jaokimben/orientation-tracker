@@ -1,7 +1,9 @@
-import { drizzle } from 'drizzle-orm/mysql2';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
 import { actions } from './drizzle/schema.ts';
 
-const db = drizzle(process.env.DATABASE_URL);
+const sqlite = new Database(process.env.DATABASE_URL || './database.db');
+const db = drizzle(sqlite);
 
 // Nouvelles actions enrichies (18 actions supplémentaires)
 const newActions = [

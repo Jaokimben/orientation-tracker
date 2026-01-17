@@ -1,7 +1,9 @@
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
 import { actions } from "./drizzle/schema.ts";
 
-const db = drizzle(process.env.DATABASE_URL);
+const sqlite = new Database(process.env.DATABASE_URL || "./database.db");
+const db = drizzle(sqlite);
 
 const newActions = [
   { id: '1.1', title: 'Recherche des écoles', description: 'Consulter les sites officiels : Celsa, ISCOM, Sup de pub, DN Made, BUT Info-Com.', deadline: '2026-01-05', phase: 'phase1', link: 'https://www.celsa.fr' },
