@@ -1,8 +1,8 @@
 {
-  "$comment": "Last updated: 2026-01-18 12:46 UTC - Force rebuild timestamp: 1768743194",
+  "$comment": "Last updated: 2026-01-18 14:52 UTC - Remove server index.js to avoid conflict",
   "version": 2,
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "dist/public",
+  "buildCommand": "npm run vercel-build && cp dist/public/index.html dist/ && cp -r dist/public/assets dist/ && rm dist/index.js",
+  "outputDirectory": "dist",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
   "cleanUrls": true,
