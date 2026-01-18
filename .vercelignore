@@ -1,25 +1,60 @@
-# Ignore server files from being served as static
+# CRITICAL: Don't serve these files as static assets
+# Only dist/public/ should be served
+
+# Server files (MUST NOT be served as static)
 dist/index.js
 dist/routers.js
 dist/_core/
+dist/*.js
+!dist/public/**
 
-# Ignore development files
-*.ts
+# Source code
 server/
 client/src/
+client/node_modules/
 drizzle/
-
-# Ignore config files
-tsconfig.json
+api/
+shared/
+*.ts
+*.tsx
+*.mjs
+tsconfig*.json
 vite.config.ts
+vitest.config.ts
 drizzle.config.ts
 
-# Ignore database
+# Database
+database.db
 *.db
 *.db-journal
+*.sql
 
-# Ignore node_modules
+# Dependencies
 node_modules/
+.pnpm-store/
 
-# Ignore git
+# Git
 .git/
+.gitignore
+.gitattributes
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+patches/
+*.md
+!README.md
+ideas.md
+todo.md

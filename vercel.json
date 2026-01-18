@@ -1,16 +1,23 @@
 {
+  "version": 2,
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/public",
-  "cleanUrls": true,
-  "trailingSlash": false,
+  "installCommand": "npm install",
+  "framework": null,
   "rewrites": [
     {
-      "source": "/api/trpc/:path*",
-      "destination": "/api"
+      "source": "/api/:path*",
+      "destination": "/api/index"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index"
     },
     {
-      "source": "/api/health",
-      "destination": "/api"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [
@@ -19,7 +26,15 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
+          "value": "no-cache, no-store, must-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        },
+        {
+          "key": "Expires",
+          "value": "0"
         }
       ]
     }
