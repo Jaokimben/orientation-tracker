@@ -1,4 +1,5 @@
 {
+  "$comment": "Last updated: 2026-01-18 12:46 UTC - Force rebuild timestamp: 1768743194",
   "version": 2,
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/public",
