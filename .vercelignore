@@ -58,3 +58,4 @@ patches/
 !README.md
 ideas.md
 todo.md
+pnpm-lock.yaml
