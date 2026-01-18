@@ -4,7 +4,6 @@
   "outputDirectory": "dist/public",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
-  "corepack": false,
   "rewrites": [
     {
       "source": "/api/:path*",
