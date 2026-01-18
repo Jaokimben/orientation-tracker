@@ -4,9 +4,9 @@
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
-// Import compiled modules
-import { appRouter } from "../dist/routers.js";
-import { createContext } from "../dist/_core/context.js";
+// Import compiled modules from api directory (built by vercel-build)
+import { appRouter } from "./routers.js";
+import { createContext } from "./_core/context.js";
 
 // Create Express app
 const app = express();

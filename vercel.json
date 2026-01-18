@@ -1,13 +1,10 @@
 {
-  "$comment": "Last updated: 2026-01-18 14:52 UTC - Remove server index.js to avoid conflict",
+  "$comment": "RADICAL FIX: Separate frontend (dist/public) and backend (api) completely",
   "version": 2,
-  "buildCommand": "npm run vercel-build && cp dist/public/index.html dist/ && cp -r dist/public/assets dist/ && rm dist/index.js",
-  "outputDirectory": "dist",
+  "buildCommand": "vite build && esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=api --out-extension:.js=.js && node migrate.mjs && node init-default-user.mjs",
+  "outputDirectory": "dist/public",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "public": false,
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -20,26 +17,11 @@
       "dest": "/api/index"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/$1"
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
     }
   ]
 }
