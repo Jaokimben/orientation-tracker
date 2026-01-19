@@ -1,7 +1,0 @@
-{
-  "settings": {
-    "installCommand": "npm install --legacy-peer-deps",
-    "buildCommand": "vite build && esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=api --out-extension:.js=.js && node migrate.mjs && node init-default-user.mjs",
-    "outputDirectory": "public"
-  }
-}
