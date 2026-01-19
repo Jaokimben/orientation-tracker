@@ -1,19 +1,11 @@
-# CRITICAL: Don't serve these files as static assets
-# Only dist/public/ should be served
+# CRITICAL: Exclude everything except what Vercel needs to serve
+# outputDirectory: "." means Vercel serves from root
+# We only want: index.html (root), public/ folder, and api/ functions
 
-# Server files (MUST NOT be served as static)
-dist/index.js
-dist/routers.js
-dist/_core/
-dist/*.js
-!dist/public/**
-
-# Source code
+# Source code (don't serve as static)
 server/
-client/src/
-client/node_modules/
+client/
 drizzle/
-api/
 shared/
 *.ts
 *.tsx
@@ -22,6 +14,7 @@ tsconfig*.json
 vite.config.ts
 vitest.config.ts
 drizzle.config.ts
+components.json
 
 # Database
 database.db
@@ -52,6 +45,9 @@ npm-debug.log*
 .vscode/
 .idea/
 
+# Build artifacts (except what we need)
+dist/
+
 # Misc
 patches/
 *.md
@@ -59,3 +55,5 @@ patches/
 ideas.md
 todo.md
 pnpm-lock.yaml
+package-lock.json
+*.sh

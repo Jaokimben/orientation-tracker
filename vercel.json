@@ -1,9 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "vite build && esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=api --out-extension:.js=.js && node migrate.mjs && node init-default-user.mjs",
-  "outputDirectory": "public",
+  "buildCommand": "vite build && esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=api --out-extension:.js=.js && node migrate.mjs && node init-default-user.mjs && cp public/index.html index.html",
+  "outputDirectory": ".",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
+  "functions": {
+    "api/index.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -14,6 +19,14 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/index"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/public/assets/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
     },
     {
       "handle": "filesystem"
