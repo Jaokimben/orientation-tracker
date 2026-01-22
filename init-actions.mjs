@@ -1,11 +1,9 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
-import { actions } from './drizzle/schema.js';
 
-const sqlite = new Database(process.env.DATABASE_URL || './database.db');
-const db = drizzle(sqlite);
+const dbPath = process.env.DATABASE_URL || './database.db';
+const sqlite = new Database(dbPath);
 
-// Nouvelles actions enrichies (18 actions supplémentaires)
+// Actions enrichies
 const newActions = [
   // PHASE 0
   { id: '0.1', title: 'Préparer mon projet d\'orientation', description: 'Consulter Avenirs.onisep.fr et Parcoursup.gouv.fr pour réfléchir à ton projet.', deadline: '2025-12-01', phase: 'phase0', link: 'https://avenirs.onisep.fr' },
@@ -30,26 +28,29 @@ const newActions = [
   { id: '2.14', title: 'Ajouter des sous-vœux si disponibles', description: 'Pour certaines formations, ajouter des sous-vœux pour augmenter tes chances.', deadline: '2026-03-05', phase: 'phase2', link: null }
 ];
 
-async function addActions() {
-  try {
-    console.log('Ajout des nouvelles actions enrichies...');
-    
-    for (const action of newActions) {
-      await db.insert(actions).values({
-        id: action.id,
-        title: action.title,
-        description: action.description,
-        deadline: action.deadline,
-        phase: action.phase,
-        link: action.link
-      });
-    }
-    
-    console.log(`✅ ${newActions.length} nouvelles actions ajoutées avec succès !`);
-  } catch (error) {
-    console.error('❌ Erreur lors de l\'ajout des actions:', error);
-    process.exit(1);
+try {
+  console.log('Ajout des nouvelles actions enrichies...');
+  
+  const insertStmt = sqlite.prepare(`
+    INSERT OR IGNORE INTO actions (id, title, description, deadline, phase, link, createdAt, updatedAt)
+    VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+  `);
+  
+  for (const action of newActions) {
+    insertStmt.run(
+      action.id,
+      action.title,
+      action.description,
+      action.deadline,
+      action.phase,
+      action.link
+    );
   }
+  
+  console.log(`✅ ${newActions.length} nouvelles actions ajoutées avec succès !`);
+} catch (error) {
+  console.error('❌ Erreur lors de l\'ajout des actions:', error);
+  process.exit(1);
+} finally {
+  sqlite.close();
 }
-
-addActions();

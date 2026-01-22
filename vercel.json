@@ -1,4 +1,16 @@
 {
   "buildCommand": "node build.mjs",
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": {
+      "runtime": "nodejs20.x",
+      "includeFiles": "public/database.db"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index"
+    }
+  ]
 }

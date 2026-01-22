@@ -5,8 +5,14 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { join } from "path";
 
-const sqlite = new Database(process.env.DATABASE_URL || "./database.db");
+// Determine database path
+const dbPath = process.env.VERCEL 
+  ? join(process.cwd(), "public", "database.db")  // On Vercel, use pre-built database
+  : (process.env.DATABASE_URL || "./database.db"); // Local development
+
+const sqlite = new Database(dbPath);
 const db = drizzle(sqlite);
 const DEFAULT_OPENID = 'student-default-openid';
 
