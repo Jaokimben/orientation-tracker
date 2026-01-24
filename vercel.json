@@ -1,3 +1,15 @@
 {
-  "buildCommand": "node build.mjs"
+  "buildCommand": "node build.mjs",
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.js"
+    }
+  ]
 }
