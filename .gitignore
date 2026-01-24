@@ -22,8 +22,6 @@ public/assets/
 *.tsbuildinfo
 
 # Server compiled files (built by Vercel)
-api/routers.js
-api/_core/
 
 # IDE
 .vscode/
