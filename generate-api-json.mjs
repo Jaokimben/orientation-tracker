@@ -75,6 +75,9 @@ const data = {
 };
 
 const outputPath = join(__dirname, 'public', 'api-data.json');
-writeFileSync(outputPath, JSON.stringify(data, null, 2));
+const rootOutputPath = join(__dirname, 'api-data.json'); // Also copy to root for Vercel
 
-console.log(`✅ Generated ${outputPath} with ${allActions.length} actions`);
+writeFileSync(outputPath, JSON.stringify(data, null, 2));
+writeFileSync(rootOutputPath, JSON.stringify(data, null, 2));
+
+console.log(`✅ Generated ${outputPath} and ${rootOutputPath} with ${allActions.length} actions`);
