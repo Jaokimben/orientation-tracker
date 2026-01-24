@@ -47,9 +47,14 @@ if (!runCommand('npx vite build', 'Frontend build')) {
   process.exit(1);
 }
 
-// Step 2: Build backend API
-if (!runCommand('npx esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=.api-build --out-extension:.js=.js', 'Backend API build')) {
-  process.exit(1);
+// Step 2: Build backend API (skip on Vercel - use pre-compiled files)
+const isVercel = process.env.VERCEL === '1';
+if (!isVercel) {
+  if (!runCommand('npx esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=.api-build --out-extension:.js=.js', 'Backend API build')) {
+    process.exit(1);
+  }
+} else {
+  console.log('\n✅ Running on Vercel - skipping API rebuild (using pre-compiled files)');
 }
 
 // Step 3: Database setup
@@ -67,20 +72,21 @@ console.log('\n📦 Packaging database...');
 copyFileSync(dbPath, join(__dirname, 'public', 'database.db'));
 console.log('✅ Database ready');
 
-// Step 5: Create Vercel API handler at /api/index.js (root level)
-console.log('\n📦 Creating Vercel API handler...');
-
-// Copy the handler template
-const apiDir = join(__dirname, 'api');
-if (!existsSync(apiDir)) {
-  mkdirSync(apiDir, { recursive: true });
-}
-
-// Copy compiled routers and context
-copyRecursive(join(__dirname, '.api-build'), apiDir);
-
-// Create the Vercel-compatible handler
-const handlerContent = `// Vercel Serverless Function Handler
+// Step 5: Create Vercel API handler (skip on Vercel - use pre-existing files)
+if (!isVercel) {
+  console.log('\n📦 Creating Vercel API handler...');
+  
+  // Copy the handler template
+  const apiDir = join(__dirname, 'api');
+  if (!existsSync(apiDir)) {
+    mkdirSync(apiDir, { recursive: true });
+  }
+  
+  // Copy compiled routers and context
+  copyRecursive(join(__dirname, '.api-build'), apiDir);
+  
+  // Create the Vercel-compatible handler
+  const handlerContent = `// Vercel Serverless Function Handler
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "./routers.js";
@@ -105,8 +111,11 @@ app.get("/api/health", (req, res) => {
 // Export for Vercel
 export default app;
 `;
-
-writeFileSync(join(apiDir, 'index.js'), handlerContent);
-console.log('✅ API handler created at /api/index.js');
+  
+  writeFileSync(join(apiDir, 'index.js'), handlerContent);
+  console.log('✅ API handler created at /api/index.js');
+} else {
+  console.log('\n✅ Running on Vercel - using pre-existing API files');
+}
 
 console.log('\n🎉 Build completed successfully!');
