@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from 'child_process';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -47,46 +47,66 @@ if (!runCommand('npx vite build', 'Frontend build')) {
   process.exit(1);
 }
 
-// Step 2: Build backend to temporary location
-if (!runCommand('npx esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=.vercel-build-api --out-extension:.js=.js', 'Backend build')) {
+// Step 2: Build backend API
+if (!runCommand('npx esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=.api-build --out-extension:.js=.js', 'Backend API build')) {
   process.exit(1);
 }
 
-// Step 3: Database setup - create in /tmp for Vercel
+// Step 3: Database setup
 const dbPath = '/tmp/database.db';
 process.env.DATABASE_URL = dbPath;
 
-console.log(`\n🔨 Database setup (${dbPath})...`);
+console.log(`\n🔨 Database setup...`);
 
-// Step 4: Database migration
 runCommand('node migrate.mjs', 'Database migration');
-
-// Step 5: Initialize default user
 runCommand('node init-default-user.mjs', 'User initialization');
-
-// Step 6: Add actions data
 runCommand('node init-actions.mjs', 'Actions data initialization');
 
-// Step 7: Copy database to public folder
-console.log('\n📦 Copying database to deployment...');
-try {
-  copyFileSync(dbPath, join(__dirname, 'public', 'database.db'));
-  console.log('✅ Database copied to public/database.db');
-} catch (error) {
-  console.error('⚠️  Could not copy database:', error.message);
+// Step 4: Copy database to public folder
+console.log('\n📦 Packaging database...');
+copyFileSync(dbPath, join(__dirname, 'public', 'database.db'));
+console.log('✅ Database ready');
+
+// Step 5: Create Vercel API handler at /api/index.js (root level)
+console.log('\n📦 Creating Vercel API handler...');
+
+// Copy the handler template
+const apiDir = join(__dirname, 'api');
+if (!existsSync(apiDir)) {
+  mkdirSync(apiDir, { recursive: true });
 }
 
-// Step 8: Setup API for Vercel serverless
-console.log('\n📦 Setting up API for Vercel...');
-const apiSrcDir = join(__dirname, 'api');
-const apiDestDir = join(__dirname, 'public', 'api');
+// Copy compiled routers and context
+copyRecursive(join(__dirname, '.api-build'), apiDir);
 
-// Copy API handler
-copyRecursive(apiSrcDir, apiDestDir);
+// Create the Vercel-compatible handler
+const handlerContent = `// Vercel Serverless Function Handler
+import express from "express";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { appRouter } from "./routers.js";
+import { createContext } from "./_core/context.js";
 
-// Copy compiled backend
-copyRecursive(join(__dirname, '.vercel-build-api'), apiDestDir);
+const app = express();
 
-console.log('✅ API copied to public/api/');
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// tRPC middleware
+app.use("/api/trpc", createExpressMiddleware({
+  router: appRouter,
+  createContext,
+}));
+
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Export for Vercel
+export default app;
+`;
+
+writeFileSync(join(apiDir, 'index.js'), handlerContent);
+console.log('✅ API handler created at /api/index.js');
 
 console.log('\n🎉 Build completed successfully!');

@@ -1,0 +1,33 @@
+# Source files (not needed in deployment)
+server/
+client/src/
+drizzle/
+shared/
+*.ts
+*.tsx
+tsconfig*.json
+vite.config.ts
+vitest.config.ts
+drizzle.config.ts
+
+# Build artifacts
+.vercel-build-api/
+.api-build/
+dist/
+
+# Database (we use the built one in public/)
+database.db
+*.db-journal
+
+# Docs
+*.md
+!README.md
+
+# Dependencies
+node_modules/.cache/
+
+# Misc
+*.sh
+patches/
+ideas.md
+todo.md
