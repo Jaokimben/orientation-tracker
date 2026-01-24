@@ -47,6 +47,11 @@ if (!runCommand('npx vite build', 'Frontend build')) {
   process.exit(1);
 }
 
+// Step 1.5: Generate static API JSON file
+if (!runCommand('node generate-api-json.mjs', 'Generate API JSON')) {
+  process.exit(1);
+}
+
 // Step 2: Build backend API (skip on Vercel - use pre-compiled files)
 const isVercel = process.env.VERCEL === '1';
 if (!isVercel) {

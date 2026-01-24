@@ -3,10 +3,10 @@ import { ActionCard } from "@/components/ActionCard";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { trpc } from "@/lib/trpc";
 import { phases } from "@/lib/data";
 import { Loader2 } from "lucide-react";
 import StudentSetup from "@/components/StudentSetup";
+import { useStaticActions } from "@/hooks/useStaticActions";
 
 export default function Home() {
   const [studentName, setStudentName] = useState<string | null>(null);
@@ -36,69 +36,8 @@ export default function Home() {
     setShowSetup(true);
   };
 
-  // Fetch actions with user progress
-  const { data: actions, isLoading: actionsLoading } = trpc.actions.list.useQuery();
-
-  // Fetch progress stats
-  const { data: stats } = trpc.actions.stats.useQuery();
-
-  // Toggle action mutation with optimistic updates
-  const utils = trpc.useUtils();
-  const toggleMutation = trpc.actions.toggle.useMutation({
-    onMutate: async ({ actionId }) => {
-      // Cancel outgoing refetches
-      await utils.actions.list.cancel();
-      await utils.actions.stats.cancel();
-
-      // Snapshot previous values
-      const previousActions = utils.actions.list.getData();
-      const previousStats = utils.actions.stats.getData();
-
-      // Optimistically update actions
-      if (previousActions) {
-        utils.actions.list.setData(undefined, (old) =>
-          old?.map((action) =>
-            action.id === actionId
-              ? {
-                  ...action,
-                  status: action.status === 'completed' ? ('pending' as const) : ('completed' as const),
-                }
-              : action
-          )
-        );
-      }
-
-      // Optimistically update stats
-      if (previousStats) {
-        const delta = previousActions?.find(a => a.id === actionId)?.status === 'completed' ? -1 : 1;
-        utils.actions.stats.setData(undefined, {
-          ...previousStats,
-          completed: previousStats.completed + delta,
-          percentage: Math.round(((previousStats.completed + delta) / previousStats.total) * 100),
-        });
-      }
-
-      return { previousActions, previousStats };
-    },
-    onError: (err, variables, context) => {
-      // Rollback on error
-      if (context?.previousActions) {
-        utils.actions.list.setData(undefined, context.previousActions);
-      }
-      if (context?.previousStats) {
-        utils.actions.stats.setData(undefined, context.previousStats);
-      }
-    },
-    onSettled: () => {
-      // Refetch to ensure consistency
-      utils.actions.list.invalidate();
-      utils.actions.stats.invalidate();
-    },
-  });
-
-  const handleToggle = (actionId: string) => {
-    toggleMutation.mutate({ actionId });
-  };
+  // Fetch actions using static JSON
+  const { actions, isLoading: actionsLoading, toggleAction, stats } = useStaticActions();
 
   // Show setup screen if no student name is configured
   if (isInitializing) {
@@ -197,7 +136,7 @@ export default function Home() {
                     <ActionCard 
                       key={action.id} 
                       action={action} 
-                      onToggle={handleToggle} 
+                      onToggle={toggleAction} 
                     />
                   ))}
                 </div>
