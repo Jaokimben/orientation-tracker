@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/dev-server.ts",
     "build": "vite build && npm run build:server && npm run db:init",
-    "vercel-build": "vite build && npm run build:server && npm run db:init",
     "build:server": "esbuild server/routers.ts server/_core/context.ts --platform=node --packages=external --bundle --format=esm --outdir=api --out-extension:.js=.js",
     "start": "NODE_ENV=production node api/index.js",
     "check": "tsc --noEmit",
