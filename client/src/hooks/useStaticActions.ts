@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { staticActionsData } from '@/lib/staticActions';
 
 export interface Action {
   id: string;
@@ -19,27 +20,39 @@ export function useStaticActions() {
     async function loadActions() {
       try {
         setIsLoading(true);
-        const response = await fetch('/api-data.json');
-        if (!response.ok) {
-          throw new Error('Failed to load actions data');
+        
+        // Try to fetch from JSON file first
+        let data: { actions: Action[] } | null = null;
+        
+        try {
+          const response = await fetch('/api-data.json');
+          if (response.ok) {
+            data = await response.json();
+            console.log('✅ Loaded actions from /api-data.json');
+          }
+        } catch (err) {
+          console.warn('⚠️ Failed to load /api-data.json, using embedded data');
         }
-        const data = await response.json();
+        
+        // Fallback to embedded data
+        const actionsArray = data?.actions || staticActionsData;
         
         // Load progress from localStorage
         const savedProgress = localStorage.getItem('actionProgress');
         const progress = savedProgress ? JSON.parse(savedProgress) : {};
         
         // Merge data with saved progress
-        const actionsWithStatus = data.actions.map((action: Action) => ({
+        const actionsWithStatus = actionsArray.map((action: Action) => ({
           ...action,
           status: progress[action.id] ? 'completed' : 'pending'
         }));
         
         setActions(actionsWithStatus);
         setError(null);
+        console.log(`✅ Loaded ${actionsWithStatus.length} actions`);
       } catch (err) {
         setError(err as Error);
-        console.error('Error loading actions:', err);
+        console.error('❌ Error loading actions:', err);
       } finally {
         setIsLoading(false);
       }
