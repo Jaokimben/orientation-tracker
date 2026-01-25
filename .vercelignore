@@ -1,9 +1,7 @@
-# Source files (keep vite.config.ts for build)
+# Source files that should NOT be deployed (keep client/ and vite.config.ts for build)
 server/
-client/src/
 drizzle/
 shared/
-*.tsx
 tsconfig*.json
 vitest.config.ts
 drizzle.config.ts
