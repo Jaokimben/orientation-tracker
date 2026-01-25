@@ -1,33 +1,52 @@
-# Source files (not needed in deployment)
+# Source files
 server/
 client/src/
 drizzle/
 shared/
 *.ts
 *.tsx
+*.mjs
 tsconfig*.json
 vite.config.ts
 vitest.config.ts
 drizzle.config.ts
 
-# Build artifacts
+# Build artifacts that should not be deployed
 .vercel-build-api/
 .api-build/
 dist/
+node_modules/.cache/
 
-# Database (we use the built one in public/)
+# Database (generated during build)
 database.db
 *.db-journal
+
+# Scripts
+*.sh
+generate-api-json.mjs
+build.mjs
+migrate.mjs
+init-default-user.mjs
+init-actions.mjs
 
 # Docs
 *.md
 !README.md
 
-# Dependencies
-node_modules/.cache/
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
 
 # Misc
-*.sh
 patches/
 ideas.md
 todo.md
