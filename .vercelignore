@@ -5,9 +5,7 @@ drizzle/
 shared/
 *.ts
 *.tsx
-*.mjs
 tsconfig*.json
-vite.config.ts
 vitest.config.ts
 drizzle.config.ts
 
@@ -21,8 +19,9 @@ node_modules/.cache/
 database.db
 *.db-journal
 
-# Scripts
+# Scripts (keep build.vercel.mjs for Vercel build)
 *.sh
+vite.config.ts
 generate-api-json.mjs
 build.mjs
 migrate.mjs
