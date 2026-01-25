@@ -42,8 +42,8 @@ function copyRecursive(src, dest) {
   }
 }
 
-// Step 1: Build frontend
-if (!runCommand('npx vite build', 'Frontend build')) {
+// Step 1: Build frontend with explicit config
+if (!runCommand('npx vite build --config vite.config.ts', 'Frontend build')) {
   process.exit(1);
 }
 
