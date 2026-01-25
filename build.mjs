@@ -42,8 +42,9 @@ function copyRecursive(src, dest) {
   }
 }
 
-// Step 1: Build frontend with explicit config
-if (!runCommand('npx vite build --config vite.config.ts', 'Frontend build')) {
+// Step 1: Build frontend with Vercel-compatible config
+const viteConfig = process.env.VERCEL ? 'vite.config.vercel.js' : 'vite.config.ts';
+if (!runCommand(`npx vite build --config ${viteConfig}`, 'Frontend build')) {
   process.exit(1);
 }
 
